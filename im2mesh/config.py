@@ -1,7 +1,7 @@
 import yaml
 from torchvision import transforms
 from im2mesh import data
-from im2mesh import onet, r2n2, psgn, pix2mesh, dmc
+from im2mesh import onet, r2n2, psgn, pix2mesh # , dmc
 from im2mesh import vnn_onet
 from im2mesh import preprocess
 
@@ -11,7 +11,7 @@ method_dict = {
     'r2n2': r2n2,
     'psgn': psgn,
     'pix2mesh': pix2mesh,
-    'dmc': dmc,
+    #'dmc': dmc,
     'vnn_onet': vnn_onet
 }
 

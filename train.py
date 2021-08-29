@@ -9,12 +9,20 @@ import matplotlib; matplotlib.use('Agg')
 from im2mesh import config, data
 from im2mesh.checkpoints import CheckpointIO
 
+# create log file
+logfile = open("logfile.txt", "w")
+
+
+def write_log(s):
+    logfile.write(s)
+    logfile.write("\n")
+    logfile.flush()
 
 # Arguments
 parser = argparse.ArgumentParser(
     description='Train a 3D reconstruction model.'
 )
-parser.add_argument('config', type=str, help='Path to config file.')
+parser.add_argument('--config', type=str, help='Path to config file.', default="configs/equinet/vnn_pointnet_resnet_so3.yaml")
 parser.add_argument('--no-cuda', action='store_true', help='Do not use cuda.')
 parser.add_argument('--exit-after', type=int, default=-1,
                     help='Checkpoint and exit after specified number of seconds'
@@ -98,7 +106,7 @@ if metric_val_best == np.inf or metric_val_best == -np.inf:
 # TODO: remove this switch
 # metric_val_best = -model_selection_sign * np.inf
 
-print('Current best validation metric (%s): %.8f'
+write_log('Current best validation metric (%s): %.8f'
       % (model_selection_metric, metric_val_best))
 
 # TODO: reintroduce or remove scheduler?
@@ -115,7 +123,7 @@ visualize_every = cfg['training']['visualize_every']
 # Print model
 nparameters = sum(p.numel() for p in model.parameters())
 print(model)
-print('Total number of parameters: %d' % nparameters)
+write_log('Total number of parameters: %d' % nparameters)
 
 while True:
     if it > args.max_iter:
@@ -130,30 +138,30 @@ while True:
 
         # Print output
         if print_every > 0 and (it % print_every) == 0:
-            print('[Epoch %02d] it=%03d, loss=%.4f'
+            write_log('[Epoch %02d] it=%03d, loss=%.4f'
                   % (epoch_it, it, loss))
 
         # Visualize output
         if visualize_every > 0 and (it % visualize_every) == 0:
-            print('Visualizing')
+            write_log('Visualizing')
             trainer.visualize(data_vis)
 
         # Save checkpoint
         if (checkpoint_every > 0 and (it % checkpoint_every) == 0):
-            print('Saving checkpoint')
+            write_log('Saving checkpoint')
             checkpoint_io.save('model.pt', epoch_it=epoch_it, it=it,
                                loss_val_best=metric_val_best)
 
         # Backup if necessary
         if (backup_every > 0 and (it % backup_every) == 0):
-            print('Backup checkpoint')
+            write_log('Backup checkpoint')
             checkpoint_io.save('model_%d.pt' % it, epoch_it=epoch_it, it=it,
                                loss_val_best=metric_val_best)
         # Run validation
         if validate_every > 0 and (it % validate_every) == 0:
             eval_dict = trainer.evaluate(val_loader)
             metric_val = eval_dict[model_selection_metric]
-            print('Validation metric (%s): %.4f'
+            write_log('Validation metric (%s): %.4f'
                   % (model_selection_metric, metric_val))
 
             for k, v in eval_dict.items():
@@ -161,13 +169,13 @@ while True:
 
             if model_selection_sign * (metric_val - metric_val_best) > 0:
                 metric_val_best = metric_val
-                print('New best model (loss %.4f)' % metric_val_best)
+                write_log('New best model (loss %.4f)' % metric_val_best)
                 checkpoint_io.save('model_best.pt', epoch_it=epoch_it, it=it,
                                    loss_val_best=metric_val_best)
 
         # Exit if necessary
         if exit_after > 0 and (time.time() - t0) >= exit_after:
-            print('Time limit reached. Exiting.')
+            write_log('Time limit reached. Exiting.')
             checkpoint_io.save('model.pt', epoch_it=epoch_it, it=it,
                                loss_val_best=metric_val_best)
             exit(3)

@@ -14,8 +14,8 @@ Args:
     transform (callable): transformation applied to data points
 '''
 # Attributes
-dataset_folder = 'data/ShapeNet'
-rotation_folder = 'data_rotations/ShapeNet'
+dataset_folder = '../../../data/occnet_data/data/ShapeNet'
+rotation_folder = '../../../output/vnn_output/data_rotations/ShapeNet'
 
 categories = os.listdir(dataset_folder)
 categories = [c for c in categories
