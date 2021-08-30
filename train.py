@@ -9,14 +9,6 @@ import matplotlib; matplotlib.use('Agg')
 from im2mesh import config, data
 from im2mesh.checkpoints import CheckpointIO
 
-# create log file
-logfile = open("logfile.txt", "w")
-
-
-def write_log(s):
-    logfile.write(s)
-    logfile.write("\n")
-    logfile.flush()
 
 # Arguments
 parser = argparse.ArgumentParser(
@@ -29,6 +21,7 @@ parser.add_argument('--exit-after', type=int, default=-1,
                          'with exit code 2.')
 parser.add_argument('--max-iter', type=int, default=300000,
                     help='Max number of training iterations')
+parser.add_argument('--logfile_name', type=str, help="logfile txt name", default="logfile.txt")
 
 args = parser.parse_args()
 cfg = config.load_config(args.config, 'configs/default.yaml')
@@ -56,6 +49,16 @@ else:
 # Output directory
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
+
+# create log file
+logfile = open(os.path.join(out_dir, args.logfile_name), "w")
+
+
+def write_log(s):
+    logfile.write(s)
+    logfile.write("\n")
+    logfile.flush()
+
 
 # Dataset
 train_dataset = config.get_dataset('train', cfg)

@@ -17,7 +17,7 @@ model:
   z_dim: 0
 training:
   out_dir: ../../output/vnn_output/results/equinet/vnn_pointnet_resnet_so3
-  batch_size: 4
+  batch_size: 32
   model_selection_metric: iou
   model_selection_mode: maximize
   latent_reg: null
